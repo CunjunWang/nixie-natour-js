@@ -74,9 +74,7 @@ app.post('/api/v1/tours', (req, res) => {
 
 // update a tour
 app.patch('/api/v1/tours/:id', (req, res) => {
-
     const id = req.params.id * 1;
-
     if (id > tours.length)
         return res.status(404).json({
             status: 'fail',
@@ -88,6 +86,22 @@ app.patch('/api/v1/tours/:id', (req, res) => {
         data: {
             tour: 'Updated tour here...'
         }
+    });
+});
+
+// delete a tour
+app.delete('/api/v1/tours/:id', (req, res) => {
+    const id = req.params.id * 1;
+    if (id > tours.length)
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+
+    // 204: no content
+    res.status(204).json({
+        status: 'success',
+        data: null
     });
 });
 
