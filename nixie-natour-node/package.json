@@ -1,0 +1,27 @@
+{
+  "name": "nixie-natour-node",
+  "version": "1.0.0",
+  "description": "Fancy tour helper application",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CunjunWang/nixie-natour-js.git"
+  },
+  "keywords": [
+    "node.js",
+    "express.js",
+    "mongodb"
+  ],
+  "author": "Cunjun Wang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CunjunWang/nixie-natour-js/issues"
+  },
+  "homepage": "https://github.com/CunjunWang/nixie-natour-js#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
