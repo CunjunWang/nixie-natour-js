@@ -1,13 +1,31 @@
 // Created by CunjunWang on 2020/1/1
 const fs = require('fs');
-
 const express = require('express');
+const morgan = require('morgan');
+
 const app = express();
+
+// ================== MIDDLE-WARES ===================
+// the order of middleware matters
+// all routes are also middleware in express
+app.use(morgan('dev'));
 
 app.use(express.json());
 
-let filename = `${__dirname}/dev-data/data/tours-simple.json`;
+app.use((req, res, next) => {
+    console.log('Hello from the middleware');
+    // must call the next() function in middle-ware
+    next();
+});
 
+app.use((req, res, next) => {
+    req.requestTime = new Date().toISOString();
+    next();
+});
+
+// ================== ROUTE HANDLERS ===================
+
+let filename = `${__dirname}/dev-data/data/tours-simple.json`;
 const tours = JSON.parse(fs.readFileSync(filename));
 
 const getAllTours = (req, res) => {
@@ -110,6 +128,8 @@ app.route('/api/v1/tours/:id')
     .get(getTourWithID)
     .patch(updateTour)
     .delete(deleteTour);
+
+// ================== SERVER =================
 
 const port = 3000;
 app.listen(port, () => {
