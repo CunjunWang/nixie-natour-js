@@ -12,20 +12,20 @@ const app = express();
 // the order of middleware matters
 // all routes are also middleware in express
 if (process.env.NODE_ENV === 'development')
-    app.use(morgan('dev'));
+  app.use(morgan('dev'));
 
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
-    console.log('Hello from the middleware');
-    // must call the next() function in middle-ware
-    next();
+  console.log('Hello from the middleware');
+  // must call the next() function in middle-ware
+  next();
 });
 
 app.use((req, res, next) => {
-    req.requestTime = new Date().toISOString();
-    next();
+  req.requestTime = new Date().toISOString();
+  next();
 });
 
 // =================== ROUTING ====================
