@@ -13,42 +13,19 @@ const DB = process.env.DATABASE_URL
   .replace('<HOST>', process.env.DATABASE_HOST)
   .replace('<DATABASE>', process.env.DATABSE);
 
+console.log(`Connecting to database ${DB}`);
+
 mongoose.connect(DB, {
   useNewUrlParser: true,
   useCreateIndex: true,
-  useFindAndModify: false
+  useFindAndModify: false,
+  useUnifiedTopology: true
 }).then(() => {
+  console.log(`Connected to database ${DB}`);
   console.log('DB connection successful!');
-});
-
-const tourSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'A tour must have a name'],
-    unique: true
-  },
-  rating: {
-    type: Number,
-    default: 4.5
-  },
-  price: {
-    type: Number,
-    required: [true, 'A tour must have a price']
-  }
-});
-
-const Tour = mongoose.model('Tour', tourSchema);
-
-const testTour = new Tour({
-  name: 'The Parker Camper',
-  rating: 4.7,
-  price: 497
-});
-
-testTour.save().then(doc => {
-  console.log(doc);
 }).catch(err => {
-  console.log('ERROR: ', err);
+  console.error(`Failed to connect to database ${DB}`);
+  console.log(err);
 });
 
 const port = process.env.PORT || 3000;
