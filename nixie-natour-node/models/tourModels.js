@@ -1,6 +1,7 @@
 // Created by CunjunWang on 2020/1/7
 
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const tourSchema = new mongoose.Schema({
   name: {
@@ -9,6 +10,7 @@ const tourSchema = new mongoose.Schema({
     unique: true,
     trim: true
   },
+  slug: String,
   duration: {
     type: Number,
     required: [true, 'A tour must have a duration']
@@ -53,7 +55,11 @@ const tourSchema = new mongoose.Schema({
     default: Date.now(),
     select: false
   },
-  startDates: [Date]
+  startDates: [Date],
+  secretTour: {
+    type: Boolean,
+    default: false
+  }
 }, {
   toJSON: {
     virtual: true
@@ -65,6 +71,47 @@ const tourSchema = new mongoose.Schema({
 
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
+});
+
+// Document middleware,
+// runs before the .save() and .create()
+// not .insertMany()
+tourSchema.pre('save', function(next) {
+  // this: current processed document
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+// tourSchema.pre('save', function(next) {
+//   // this: current processed document
+//   console.log('Will save document');
+//   next();
+// });
+//
+// // runs after the .save() and .create()
+// tourSchema.post('save', function(doc, next) {
+//   // this: current processed document
+//   console.log(doc);
+//   next();
+// });
+
+// Query middleware
+tourSchema.pre(/^find/, function(next) {
+  // this: current Query object
+  this.find({ secretTour: { $ne: true } });
+  this.start = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function(docs, next) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds`);
+  next();
+});
+
+// Aggregation middleware
+tourSchema.pre('aggregate', function(next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  next();
 });
 
 const Tour = mongoose.model('Tour', tourSchema);
