@@ -1,51 +1,27 @@
 // Created by CunjunWang on 2020/1/1
 
 const Tour = require('./../models/tourModels');
+const APIFeatures = require('./../utils/apiFeatures');
+
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
 
 exports.getAllTours = async (req, res) => {
   try {
     // Build the query
     // 1. filtering
-    const queryObj = { ...req.query };
-    const excludeFields = ['page', 'sort', 'limit', 'fields'];
-    excludeFields.forEach(el => delete queryObj[el]);
-
-    // more filtering
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-
-    let query = Tour.find(JSON.parse(queryStr));
-
     // 2. sorting
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
-    } else
-      query = query.sort('-createdAt');
-
     // 3. field limiting / projecting
-    if (req.query.fields) {
-      const fields = req.query.sort.split(',').join(' ');
-      query = query.select(fields);
-    } else
-      query = query.select('-__v');
-
     // 4. paging
-    // page=2&limit=10: 1-10 on page 1, 11-20 on page 2 ...
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 10;
-    const skip = (page - 1) * limit;
-    console.log(page + ' ' + limit + ' ' + skip);
-    query = query.skip(skip).limit(limit);
-
-    if (req.query.page) {
-      const numTours = await Tour.countDocuments();
-      if (skip >= numTours)
-        throw new Error('This page does not exist.');
-    }
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter().sort().limitFields().paginate();
 
     // Execute the query
-    const tours = await query;
+    const tours = await features.query;
 
     // Send response
     res.status(200).json({
