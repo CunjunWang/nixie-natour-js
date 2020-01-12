@@ -1,10 +1,15 @@
 // Created by CunjunWang on 2020/1/1
 
 const mongoose = require('mongoose');
-
 const env = require('dotenv');
-env.config({ path: './config.env' });
 
+process.on('uncaughtException', err => {
+  console.log('Uncaught Exception. Shutting down......');
+  console.log(err.name, err.message);
+  process.exit(1);
+});
+
+env.config({ path: './config.env' });
 const app = require('./app');
 
 const DB = process.env.DATABASE_URL
@@ -23,12 +28,17 @@ mongoose.connect(DB, {
 }).then(() => {
   console.log(`Connected to database ${DB}`);
   console.log('DB connection successful!');
-}).catch(err => {
-  console.error(`Failed to connect to database ${DB}`);
-  console.log(err);
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
+});
+
+process.on('unhandledRejection', err => {
+  console.log('Unhandled Rejection. Shutting down......');
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
 });
