@@ -1,6 +1,6 @@
 // Created by CunjunWang on 2020/1/1
 
-const Tour = require('./../models/tourModels');
+const Tour = require('../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures');
 const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
