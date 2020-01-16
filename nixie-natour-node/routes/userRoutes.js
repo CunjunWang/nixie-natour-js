@@ -3,20 +3,24 @@
 const express = require('express');
 const userController = require('./../controllers/userController');
 const authController = require('./../controllers/authController');
-const reviewController = require('./../controllers/reviewController');
 const router = express.Router();
 
+// The following actions are available to every public user
 router.post('/signUp', authController.signUp);
 router.post('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
-router.patch('/updateMyPassword',
-  authController.protect, authController.updatePassword);
 
-router.patch('/updateMe',
-  authController.protect, userController.updateMe);
-router.delete('/deleteMe',
-  authController.protect, userController.deleteMe);
+// The following actions should be performed by logged in users
+router.use(authController.protect);
+
+router.get('/me', userController.getMe, userController.getUserWithID);
+router.patch('/updateMyPassword', authController.updatePassword);
+router.patch('/updateMe', userController.updateMe);
+router.delete('/deleteMe', userController.deleteMe);
+
+// The following actions should be performed only by admin
+router.use(authController.restrictTo('admin'));
 
 router
   .route('/')

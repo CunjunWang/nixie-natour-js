@@ -8,9 +8,12 @@ const router = express.Router({
   mergeParams: true
 });
 
+// The following actions should be performed only by logged in users
+router.use(authController.protect);
+
 router.route('/')
   .get(reviewController.getAllReviews)
-  .post(authController.protect,
+  .post(
     authController.restrictTo('user'),
     reviewController.setTourUserIds,
     reviewController.createReview);
@@ -18,7 +21,11 @@ router.route('/')
 router
   .route('/:id')
   .get(reviewController.getReviewWithId)
-  .patch(reviewController.updateReview)
-  .delete(reviewController.deleteReview);
+  .patch(
+    authController.restrictTo('admin', 'user'),
+    reviewController.updateReview)
+  .delete(
+    authController.restrictTo('admin', 'user'),
+    reviewController.deleteReview);
 
 module.exports = router;
