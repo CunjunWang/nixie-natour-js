@@ -3,6 +3,7 @@
 const User = require('./../models/userModel');
 const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
+const factory = require('./handlerFactory');
 
 const filterObject = (obj, ...allowedFields) => {
   const newObj = {};
@@ -13,43 +14,10 @@ const filterObject = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users
-    }
-  });
-});
-
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
-    message: 'Not yet defined'
-  });
-};
-
-exports.getUserWithID = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Not yet defined'
-  });
-};
-
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Not yet defined'
-  });
-};
-
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Not yet defined'
+    message: 'Please use sign up instead'
   });
 };
 
@@ -76,6 +44,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
+// user use to inactivate his account
 exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, {
     active: false
@@ -86,3 +55,12 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null
   });
 });
+
+exports.getAllUsers = factory.getAll(User);
+
+exports.getUserWithID = factory.getOne(User);
+
+exports.updateUser = factory.updateOne(User);
+
+// admin use to delete a user
+exports.deleteUser = factory.deleteOne(User);
