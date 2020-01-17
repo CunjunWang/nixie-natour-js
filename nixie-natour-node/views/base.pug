@@ -1,4 +1,4 @@
-// Created by CunjunWang on 2020/1/17
+//- Created by CunjunWang on 2020/1/17
 
 doctype html
 html
@@ -8,14 +8,14 @@ html
         link(rel="stylesheet" href='css/style.css')
         link(rel='shortcut icon' type='image/png' href='img/favicon.png')
         link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
-        title Natours | Exciting tours for adventurous people
+        title Natours | #{title}
     body
         // HEADER
         include _header
 
         // CONTENT
-        section.overview
-            h1= tour
+        block content
+            h1 for test case
 
         // FOOTER
         include _footer
