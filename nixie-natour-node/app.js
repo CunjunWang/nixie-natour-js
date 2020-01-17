@@ -16,6 +16,8 @@ const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
 
+app.set('view engine', 'pug');
+
 // ================== Global MIDDLE-WARES ===================
 // the order of middleware matters
 // all routes are also middleware in express
