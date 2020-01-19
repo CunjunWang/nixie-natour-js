@@ -19,7 +19,6 @@ const createAndSendToken = (user, statusCode, res) => {
 
   const cookieOptions = {
     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRATION * 24 * 3600 * 1000),
-    secure: false,
     httpOnly: true
   };
 
@@ -70,6 +69,17 @@ exports.login = catchAsync(async (req, res, next) => {
   // 3. send the JWT to client
   createAndSendToken(user, 200, res);
 });
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'logged out', {
+    expires: new Date(Date.now() * 10 * 1000),
+    httpOnly: true
+  });
+
+  res.status(200).json({
+    status: 'success'
+  });
+};
 
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
@@ -202,3 +212,32 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // 4. log the user in, send JWT
   createAndSendToken(user, 200, res);
 });
+
+// Only for render pages, no errors
+exports.isLoggedIn = async (req, res, next) => {
+  try {
+    const token = req.cookies.jwt;
+    if (token) {
+      // 1. verify the token
+      const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+      // 2. check if the user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser)
+        return next();
+
+      // 3. check if user changed password after the JWT is issued
+      const changed = currentUser.changedPasswordAfter(decoded.iat);
+      if (changed)
+        return next();
+
+      // 4. if not any problem, pass protection, grant access to the next route.
+      res.locals.user = currentUser;
+      return next();
+    }
+  } catch (err) {
+    return next();
+  }
+
+  next();
+};

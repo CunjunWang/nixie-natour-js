@@ -8,6 +8,7 @@ const router = express.Router();
 // The following actions are available to every public user
 router.post('/signUp', authController.signUp);
 router.post('/login', authController.login);
+router.get('/logout', authController.logout);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
