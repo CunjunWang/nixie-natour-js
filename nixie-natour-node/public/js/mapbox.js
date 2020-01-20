@@ -3,7 +3,6 @@
 export const displayMap = (locations) => {
 
   mapboxgl.accessToken = 'pk.eyJ1IjoiZHVja3djaiIsImEiOiJjazVrbjhjamcwZnpsM2tuNWNnZ2sxdnNmIn0.MrROKDXp6mDwuUZY_f0ErA';
-  console.log(mapboxgl.accessToken);
   let map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/duckwcj/ck5knikfi31z51inwadv0y9qk',
