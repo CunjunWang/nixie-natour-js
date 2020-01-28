@@ -22,11 +22,14 @@ exports.createUser = (req, res) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
+  console.log('Receive request: ' + req);
+
   // 1. create error if user post password data
   if (req.body.password || req.body.passwordConfirm)
     return next(new AppError('This route is not for password updates', 400));
 
   // 2. filter fields not allowed to update
+  console.log(req.body);
   const filterBody = filterObject(req.body, 'name', 'email');
 
   // 3. update user document

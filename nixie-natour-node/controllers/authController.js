@@ -216,9 +216,9 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
 // Only for render pages, no errors
 exports.isLoggedIn = async (req, res, next) => {
-  try {
-    const token = req.cookies.jwt;
-    if (token) {
+  const token = req.cookies.jwt;
+  if (token) {
+    try {
       // 1. verify the token
       const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
@@ -235,9 +235,9 @@ exports.isLoggedIn = async (req, res, next) => {
       // 4. if not any problem, pass protection, grant access to the next route.
       res.locals.user = currentUser;
       return next();
+    } catch (err) {
+      return next();
     }
-  } catch (err) {
-    return next();
   }
 
   next();
