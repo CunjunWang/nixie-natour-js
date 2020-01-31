@@ -1,9 +1,36 @@
 // Created by CunjunWang on 2020/1/1
 
+const multer = require('multer');
 const User = require('./../models/userModel');
 const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/users');
+  },
+  filename: (req, file, cb) => {
+    // user-id-timestamp.jpeg
+    const ext = file.mimetype.split('/')[1];
+    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  }
+});
+
+// test if the file is an image
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image'))
+    cb(null, true);
+  else
+    cb(new AppError('Not an image! Please upload only images', 400), false);
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploadUserPhoto = upload.single('photo');
 
 const filterObject = (obj, ...allowedFields) => {
   const newObj = {};
@@ -22,7 +49,8 @@ exports.createUser = (req, res) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-  console.log('Receive request: ' + req);
+  console.log(req.file);
+  console.log(req.body);
 
   // 1. create error if user post password data
   if (req.body.password || req.body.passwordConfirm)
