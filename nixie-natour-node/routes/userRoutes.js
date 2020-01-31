@@ -18,7 +18,10 @@ router.use(authController.protect);
 
 router.get('/me', userController.getMe, userController.getUserWithID);
 router.patch('/updateMyPassword', authController.updatePassword);
-router.patch('/updateMe', userController.uploadUserPhoto, userController.updateMe);
+router.patch('/updateMe',
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  userController.updateMe);
 router.delete('/deleteMe', userController.deleteMe);
 
 // The following actions should be performed only by admin
