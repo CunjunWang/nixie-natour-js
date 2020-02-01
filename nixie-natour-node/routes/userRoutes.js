@@ -3,6 +3,7 @@
 const express = require('express');
 const userController = require('./../controllers/userController');
 const authController = require('./../controllers/authController');
+
 const router = express.Router();
 
 // The following actions are available to every public user
@@ -17,7 +18,10 @@ router.use(authController.protect);
 
 router.get('/me', userController.getMe, userController.getUserWithID);
 router.patch('/updateMyPassword', authController.updatePassword);
-router.patch('/updateMe', userController.updateMe);
+router.patch('/updateMe',
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  userController.updateMe);
 router.delete('/deleteMe', userController.deleteMe);
 
 // The following actions should be performed only by admin
