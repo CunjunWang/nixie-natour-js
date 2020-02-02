@@ -1,30 +1,56 @@
 // Created by CunjunWang on 2020/1/13
 
 const mailer = require('nodemailer');
-const catchAsync = require('./../utils/catchAsync');
+const pug = require('pug');
+const htmlToText = require('html-to-text');
 
-const sendEmail = async options => {
-  // 1. create a transporter
-  const transporter = mailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    auth: {
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD
+module.exports = class Email {
+  constructor(user, url) {
+    this.to = user.email;
+    this.firstName = user.name.split(' ')[0];
+    this.url = url;
+    this.from = `Cunjun Wang <${process.env.EMAIL_FROM}>`;
+  }
+
+  newTransport() {
+    if (process.env.NODE_ENV === 'production') {
+      // sendgrid
+      return;
     }
-  });
 
-  // 2. define the email options
-  const mailOptions = {
-    from: 'Cunjun Wang <duckwcj@gmail.com>',
-    to: options.email,
-    subject: options.subject,
-    text: options.message
-    // html:
-  };
+    return mailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
+  }
 
-  // 3. send the email with mailer
-  await transporter.sendMail(mailOptions);
+  // send the actual email
+  async send(template, subject) {
+    // 1. Render the HTML based on a pug template
+    const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
+      firstName: this.firstName,
+      url: this.url,
+      subject
+    });
+
+    // 2. Define the email options
+    const mailOptions = {
+      from: this.from,
+      to: this.to,
+      subject,
+      html,
+      text: htmlToText.fromString(html)
+    };
+
+    // 3. Create a transport and send email
+    await this.newTransport().sendMail(mailOptions);
+  }
+
+  async sendWelcome() {
+    await this.send('welcome', 'Welcome to the Natours Family!');
+  }
 };
-
-module.exports = sendEmail;
