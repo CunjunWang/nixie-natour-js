@@ -16,7 +16,7 @@ const DB = process.env.DATABASE_URL
   .replace('<USERNAME>', process.env.DATABASE_USERNAME)
   .replace('<PASSWORD>', process.env.DATABASE_PASSWORD)
   .replace('<HOST>', process.env.DATABASE_HOST)
-  .replace('<DATABASE>', process.env.DATABSE);
+  .replace('<DATABASE>', process.env.DATABASE);
 
 console.log(`Connecting to database ${DB}`);
 
